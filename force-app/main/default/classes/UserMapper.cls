@@ -104,6 +104,12 @@ public without sharing class UserMapper extends C3C_AbstractMapper implements C3
     //Métodos
     public Object newInstance(Object params)
     {
+        // Modifiquei aqui para que seja possível construir User através de JSON
+        if (params instanceOf Map<String, Object>)
+        {
+            
+        }
+
         if(params instanceOf SObject)
             return new UserMapper((SObject) params);
 

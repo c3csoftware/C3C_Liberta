@@ -6,8 +6,6 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
 
     public void registrarNegocioDoActiveCampaign(NegocioActiveCampaignRequest negocioActiveCampaign)
     {
-        System.debug('Ta vindo os dados pelos dados de exemplo');
-
         //Verificar se no pipeline_title faz tem as tags [LS] e [Hunters], se não..
         Boolean verificarPipilineTitleTemLSOuHunters = !negocioActiveCampaign.pipeline_title.contains('[LS]') && !negocioActiveCampaign.pipeline_title.contains('[Hunters]');
 
@@ -26,6 +24,10 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
         //Definindo o titúlo do négocio
         String tituloNegocio = negocioActiveCampaign.title.length() > 80 ? negocioActiveCampaign.title.left(80) : negocioActiveCampaign.title;
 
+        /**
+         * Verifica se o negócio está na base e caso esteja, apenas muda o nome do título. 
+         * Modifique esse if se você quer modificar o registro de Negócio.
+         */
         if(negocio != null && negocio.recordId != null)
         {
             //Caso o negócio exista na base de dados
@@ -53,8 +55,6 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
             else
             {
                 //Caso o stage_title não seja "Deals" e "Leads"
-                
-
                 // Trecho de código para ajustar os Negócios que estavam vindo sem nomeFila.
                 String nomeFila = negocioActiveCampaign.title;
                 nomeFila = this.ajustarNomeFila(nomeFila, negocioActiveCampaign.pipeline_title);
@@ -86,16 +86,6 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
             
         
         nomeFila = this.ajustarNomeFila(nomeFila, negocioActiveCampaign.pipeline_title);
-        //Definindo tag do nome da fila
-        // String tagFila = negocioActiveCampaign.pipeline_title.contains('[LS]') ? '[LS]' : negocioActiveCampaign.pipeline_title.contains('[Hunters]') ? '[Hunters]' : '';
-
-        // nomeFila = tagFila + nomeFila;
-
-        // nomeFila = nomeFila.length() > 40 ? nomeFila.left(40) : nomeFila;
-
-        // nomeFila = nomeFila.replaceAll('\\s+\\s+', ' ');
-
-        // nomeFila = nomeFila.replaceAll('\\s$', '');
 
         //Buscando fila pelo nome da fila
         GroupMapper fila = instanciaGroupService.obterGroupPorNome(nomeFila);
@@ -138,15 +128,15 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
             LeadFilho__c.SObjectType, Lead.SObjectType
         });
 
-        System.debug('Entrou aqui: ');
-        System.debug('JSON UsuarioDomain: ' +  jsonUsuarioDomain);
         UserMapper usuario;
         if (jsonUsuarioDomain != null)
             usuario = (UserMapper) JSON.deserialize(jsonUsuarioDomain, UserMapper.class);
-        System.debug('Passou por aqui: ');
+
         //Construindo váriaveis apartir do JSON
         NegocioDomain negocio = (NegocioDomain) JSON.deserialize(jsonNegocio, NegocioDomain.class);
         NegocioActiveCampaignRequest negocioActiveCampaign = (NegocioActiveCampaignRequest) JSON.deserialize(jsonNegocioActiveCampaign, NegocioActiveCampaignRequest.class);
+
+        System.debug('Negocio Active Campaign: ' + JSON.serialize(negocioActiveCampaign));
 
         FunilDomain funil;
 
@@ -162,16 +152,18 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
         //Buscar lead pelo contactid do ActiveCampaign
         LeadMapper leadRelacionadoActiveCampaign = instanciaLeadService.obterLeadPorActiveCampaignId(negocioActiveCampaign.contactid);
 
+        // Pega a fila de LeadSemDono e coloca como proprietário do Lead que será criado.
+        GroupMapper filaMapper = ((IGroupService) C3C_DIContainer_Injector.getInstance('GroupService')).obterGroupPorNome('Lead sem Dono');
+
         if(leadRelacionadoActiveCampaign == null || leadRelacionadoActiveCampaign.recordId == null)
         {
-            String nomeLead = (negocioActiveCampaign.contact_firstname != null ? negocioActiveCampaign.contact_firstname : '') + ' Lead - '+negocioActiveCampaign.contactid;
+            String nomeLead = (negocioActiveCampaign.contact_firstname != null ? negocioActiveCampaign.contact_firstname : '') == '' ? ' Lead - '+negocioActiveCampaign.contactid : negocioActiveCampaign.contact_firstname;
 
             //Caso lead não seja encontrado, criar novo lead relacionado ao contactid do ActiveCampaign
             leadRelacionadoActiveCampaign = instanciaLeadService.inserirAtualizarLeadPorActiveCampaignId(negocioActiveCampaign.contactid, '', nomeLead, negocioActiveCampaign.contact_email, nomeLead, '');
-            System.debug('Usuário: ' + JSON.serialize(usuario));
-            System.debug('Negócio proprietário: ' + negocio.proprietario);
+           
             // Aqui onde ocorre o setamento do proprietário do Lead;
-            leadRelacionadoActiveCampaign.proprietario = usuario != null ? usuario.idRegistro : '0058G000000IZKrQAO';
+            leadRelacionadoActiveCampaign.proprietario = usuario != null ? usuario.idRegistro : filaMapper.recordId;
             uow.registerDirty(leadRelacionadoActiveCampaign.record);
         }
 
@@ -182,7 +174,6 @@ public without sharing virtual class NegocioAPIService implements INegocioAPISer
         if(negocioActiveCampaign.pipeline_title.contains('[Hunters]'))
         {
             //Relacionar o lead ao negócio
-            System.debug('LeadRelacionaActiveCampaign : ' + JSON.serialize(leadRelacionadoActiveCampaign));
             negocio.lead = leadRelacionadoActiveCampaign.recordId;
         }
         //Verificar se existe a tag [LS] no pipeline title, se sim criar oportunidade relacionada ao lead/conta, e relacionar oportunidade ao negócio

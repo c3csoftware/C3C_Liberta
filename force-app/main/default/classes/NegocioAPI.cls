@@ -11,11 +11,11 @@ global without sharing class NegocioAPI
         RestRequest req = RestContext.request;
         
         Map<String, String> reqConvertido = ConvertCharsetUtils.converterMapaIsoParaUTF8(req.params);
-        System.debug('Requisição Convertida: ' + reqConvertido);
+        System.debug('Requisição Convertida: ' + JSON.serialize(reqConvertido));
         System.debug(JSON.serialize(req.params));
         instanciaNegocioAPIService.registrarNegocioDoActiveCampaign((NegocioActiveCampaignRequest) C3C_DIContainer_Injector.newInstance('NegocioActiveCampaignRequest', reqConvertido));
 
-        return 'Registrnado negócio.';
+        return 'Registrando negócio.';
     }
 
     //
