@@ -1,0 +1,287 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global"
+>
+    <lightning:empApi aura:id="empApi"/>
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+
+    <!--Atributos-->
+
+    <aura:attribute name="identificacaoGuia" type="String" />
+    <aura:attribute name="registroRelacionado" type="String" />
+    <aura:attribute name="ligarRedirect" type="Boolean" default="false" />
+    <aura:attribute name="ativarEventoCallbox" type="Boolean" default="true" />
+
+    <!--Gerenciar arquivo-->
+    <aura:attribute name="rendererCarregado" type="Boolean" default="false" />
+    <aura:attribute name="arquivoRTCCarregado" type="Boolean" default="false" />
+
+    <!--Telefone-->
+    <aura:attribute name="telefone" type="String" default="" />
+    <aura:attribute name="telefoneFormated" type="String" default="" />
+
+    <!--Informação de login callbox-->
+    <aura:attribute name="ramal" type="String" />
+    <aura:attribute name="serverL5" type="String" />
+    <aura:attribute name="serverCallbox" type="String" />
+    <aura:attribute name="senhaCallbox" type="String" />
+    <aura:attribute name="ramalRegistrado" type="Boolean" default="false" />
+
+    <!--Atributos para definir o que fazer quando cadastrar ramal-->
+    <aura:attribute name="ramalCadastrado" type="Boolean" default="false" />
+
+    <!--Atributos para definir o que mostrar no conteudo-->
+    <!--Atributo para mostrar spinner na tela-->
+    <aura:attribute name="carregando" type="Boolean" default="true" />
+
+    <!--Atributo informando que está buscando as informações de login callbox do usuário-->
+    <aura:attribute name="consultandoLogin" type="Boolean" default="true" />
+
+    <!--Atributo para verificar se o login do usuário já está cadastrado-->
+    <aura:attribute name="loginCadastrado" type="Boolean" default="false"/>
+
+    <!--Atributos para controlar ligação-->
+    <aura:attribute name="statusLigacao" type="String" default="discando" />
+    <aura:attribute name="callState" type="Object" />
+    <aura:attribute name="carregandoLigacao" type="Boolean" default="true" />
+    <aura:attribute name="ligandoParaTelefone" type="Boolean" default="false" />
+    <aura:attribute name="ramalTransferencia" type="String" />
+    <aura:attribute name="registrarRamalELigar" type="Boolean" default="false" />
+
+    <!--Controles da ligação-->
+    <aura:attribute name="mostrarControleLigacao" type="Boolean" default="false" />
+    <aura:attribute name="ligacaoMutada" type="Boolean" default="false" />
+    <aura:attribute name="ligacaoPausada" type="Boolean" default="false" />
+    <aura:attribute name="transferirLigacao" type="Boolean" default="false" />
+    <aura:attribute name="transferenciaEmAndamento" type="Boolean" default="false" />
+    <aura:attribute name="tentativaTranferencia" type="Boolean" default="false" />
+
+    <!--Dados do banco de dados-->
+    <aura:attribute name="idTarefa" type="String" />
+    <aura:attribute name="verHistorico" type="Boolean" default="false" />
+    <aura:attribute name="historico" type="List" />
+
+    <!--Atributos alerta-->
+    <aura:attribute name="mostrarAlerta" type="Boolean" default="false" />
+    <aura:attribute name="tipoAlerta" type="String" />
+    <aura:attribute name="mensagemAlerta" type="String" />
+
+    <!--Serviços Back-->
+    <c:callService service="AcessoCallBoxService" aura:id="AcessoCallBoxService" />
+    <c:callService service="TaskCallService" aura:id="TaskCallService" />
+
+    <!--Manipuladores-->
+    <aura:handler name="pressionarTeclaEvent" event="c:PressionarTeclaEvent" action="{!c.manipularTeclaPressionada}"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <!--Eventos-->
+    <aura:registerEvent name="CallboxAuraEvent" type="c:CallboxAuraEvent" />
+
+    <!--Métodos Externos-->
+
+    <aura:method name="logarRamalELigarTelfone" action="{!c.logarRamalELigarTelfone}" access="global"> 
+        <aura:attribute name="telefone" type="String" /> 
+        <aura:attribute name="idTarefa" type="String" /> 
+        <aura:attribute name="registroRelacionado" type="String" /> 
+    </aura:method>
+
+    <aura:method name="unregisterRamal" action="{!c.unregisterRamal}" access="global">
+    </aura:method>
+
+    <!--Conteúdo-->
+    <lightning:card>
+        <aura:if isTrue="{!or(v.carregando, v.ligarRedirect)}">
+            <lightning:spinner size="small" />
+        </aura:if>
+        <div class="conteudo">
+            <aura:if isTrue="{!not(v.consultandoLogin)}">
+                <aura:if isTrue="{!v.loginCadastrado}">
+                    <!--Tela para ela efetuar a ligação-->
+                    <div class="contentCTI">
+                        <div class="menuBar">
+                            <div>
+                                <h1>
+                                    <lightning:icon iconName="utility:questions_and_answers" size="small" alternativeText="atendente" title="atendente" /> Ramal - {!v.ramal} 
+                                </h1>
+                                <span class="stateRamal" onclick="{!or(v.statusLigacao == 'discando', v.statusLigacao == 'disconnected') ? c.mudarStatusRamal : ''}" >
+                                    <lightning:buttonIcon iconName="utility:record" variant="bare" class="{!v.ramalRegistrado ? 'online estadoRamal' : 'offline estadoRamal'}" />
+                                    {!v.ramalRegistrado ? 'Online' : 'Offline'}
+                                </span>
+                            </div>
+                            <div class="alinharItens">
+                                <lightning:buttonStateful
+                                    labelWhenOff="Editar ramal"
+                                    labelWhenOn="Editar ramal"
+                                    iconNameWhenOff="utility:edit"
+                                    onclick="{!or(v.statusLigacao == 'discando', v.statusLigacao == 'disconnected') ? c.editarRamal : ''}"
+                                />
+                                <span class="verHistorico" onclick="{!or(v.statusLigacao == 'discando', v.statusLigacao == 'disconnected') ? c.abrirOuOcultarHistorico : ''}">
+                                    {!v.verHistorico ? 'Ocultar histórico' : 'Ver histórico'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <aura:if isTrue="{!v.mostrarAlerta}">
+                            <div class="{!'flutuar slds-notify slds-notify_alert slds-alert_'+v.tipoAlerta}" role="alert">
+                                <div>
+                                    <lightning:icon iconName="{!'utility:'+v.tipoAlerta}" alternativeText="{!v.tipoAlerta+'!'}" variant="inverse" size="x-small" title="{!v.tipoAlerta}" />
+                                    <h2>{!v.mensagemAlerta}</h2>
+                                	<lightning:buttonIcon iconName="utility:close" alternativeText="fechar" variant="bare-inverse" size="small" title="Fechar" onclick="{!c.fecharAlerta}" />
+                                </div>
+                            </div>
+                        </aura:if>
+
+                        <aura:if isTrue="{!v.verHistorico}">
+                            <div class="historico">
+                                <aura:if isTrue="{!v.historico.length == 0}">
+                                    <p>Não há nada para mostrar.</p>
+                                    <aura:set attribute="else">
+                                        <div class="listaItemHistorico">
+                                            <aura:iteration items="{!v.historico}" var="itemHistorico">
+                                                <div class="itemHistorico">
+                                                    <div class="detalheItemHistorico">
+                                                        <span class="numero">{!itemHistorico.numeroCelular}</span>
+                                                        <span class="dataLigacao">Data da ligação: {!itemHistorico.dataLigacao} - <a href="{!'/'+itemHistorico.idTarefa}">Ver mais</a></span>
+                                                    </div>
+                                                    <lightning:buttonIcon iconName="utility:call" size="large" variant="brand" value="{!itemHistorico.numeroCelular}" alternativeText="call" title="call" onclick="{!c.ligarTelefone}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+
+                            <aura:set attribute="else">
+                                <aura:if isTrue="{!v.statusLigacao == 'discando'}">
+                                    <!--Discador-->
+                                    <div class="discadorNumero">
+                                        <lightning:input 
+                                            aura:id="numeroTelefone"
+                                            label="Número do celular: " 
+                                            class="inputTelefone" 
+                                            type="tel" 
+                                            value="{!v.telefone}"
+                                            messageWhenBadInput="Formato permitido deve ser DDDXXXXXXXXX" 
+                                        />
+                                        <c:TecladoNumerico />
+                                        <div class="btnLigar">
+                                            <lightning:button class="largeButton" variant="brand" label="Ligar" title="Ligar" disabled="{!not(v.ramalRegistrado)}" onclick="{!c.ligarParaTelefone}" />
+                                            <aura:if isTrue="{!not(v.ramalRegistrado)}">
+                                                <span class="mensagemAjuda">Você precisa estar online para efetuar ligações.</span>
+                                            </aura:if>
+                                        </div>
+                                    </div>
+
+                                    <!--Chamada em andamento-->
+                                    <aura:set attribute="else">
+                                        <div class="progressoChamada">
+                                            <!--Conectando a ligação-->
+                                            <aura:if isTrue="{!v.statusLigacao == 'conectandoLigacao'}">
+                                                <p>Conectando ligação...</p>
+                                            </aura:if>
+
+                                            <!--Ligando-->
+                                            <aura:if isTrue="{!and(v.statusLigacao == 'setup', v.ligandoParaTelefone)}">
+                                                <p>Ligando para {!v.telefone}...</p>
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!and(v.statusLigacao == 'setup', not(v.ligandoParaTelefone))}">
+                                                <p>{!v.telefone} está ligando</p>
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!and(not(v.ligacaoPausada), or(v.statusLigacao == 'connected', or(v.statusLigacao == 'unmute', or(v.statusLigacao == 'mute', v.statusLigacao == 'unhold'))))}">
+                                                <p>Em chamada</p>
+                                                <span>{!v.telefone}</span>
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!v.statusLigacao == 'hold'}">
+                                                <p>Chamada pausada</p>
+                                                <span>{!v.telefone}</span>
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!v.statusLigacao == 'disconnected'}">
+                                                <p>Ligação finalizada</p>
+                                                <span>{!v.telefone}</span>
+                                                <lightning:button label="Voltar ao discador" variant="brand" title="Voltar ao discador" onclick="{! c.voltarDiscador }" />
+                                            </aura:if>
+
+                                            <!--Loading e contador de segundos-->
+                                            <aura:if isTrue="{!v.statusLigacao != 'disconnected'}">
+                                                <aura:if isTrue="{!v.carregandoLigacao}">
+                                                    <span class="slds-icon-typing slds-is-animated" title="User is typing">
+                                                        <span class="slds-icon-typing__dot"></span>
+                                                        <span class="slds-icon-typing__dot"></span>
+                                                        <span class="slds-icon-typing__dot"></span>
+                                                        <span class="slds-assistive-text">User is typing</span>
+                                                    </span>
+                                                    <aura:set attribute="else">
+                                                        <c:RelogioCMP />
+                                                    </aura:set>
+                                                </aura:if>
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!v.transferirLigacao}">
+                                                <div class="modalTransferencia">
+                                                    <aura:if isTrue="{!v.tentativaTranferencia}">
+                                                        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                                                            <lightning:icon iconName="utility:warning" alternativeText="Warning!" size="small" title="Warning" />
+                                                            <h2>Uma transferência está em andamento, por favor aguarde um momento.</h2>
+                                                        </div>
+                                                    </aura:if>
+                                                    <p>Para efetuar a transferência digite o número do Ramal para qual deseja transferir.</p>
+                                                    <lightning:input 
+                                                        aura:id="numeroRamal"
+                                                        label="Número do Ramal: " 
+                                                        class="inputRamal" 
+                                                        type="tel" 
+                                                        value="{!v.ramalTransferencia}"
+                                                    />
+                                                    <div class="btnsTransferencia">
+                                                        <lightning:button label="Cancelar" title="Cancelar" onclick="{! c.cancelarTransferencia }" />
+                                                        <lightning:button label="Conectar com Ramal" disabled="{!v.transferenciaEmAndamento}" variant="brand" title="Conectar com Ramal" onclick="{! c.conectarRamal }" class="btnTransferir" />
+                                                        <lightning:button label="Transferir ligação" disabled="{!or(v.transferenciaEmAndamento, not(v.tentativaTranferencia))}" variant="brand" title="Transferir ligação" onclick="{! c.transferirLigacao }" class="btnTransferir" />
+                                                    </div>
+                                                </div>
+                                            </aura:if>
+
+                                            <!--Controle da chamada -->
+                                            <aura:if isTrue="{!and(v.mostrarControleLigacao, v.statusLigacao != 'disconnected')}">
+                                                <div class="controleLigacao">
+                                                    <aura:if isTrue="{!and(not(v.ligandoParaTelefone), v.statusLigacao == 'setup')}">
+                                                        <lightning:buttonIcon iconName="utility:close" class="destructive" size="large" variant="destructive" alternativeText="close" title="close" onclick="{!c.recusarLigacao}" />
+                                                        <lightning:buttonIcon iconName="utility:call" class="success" size="large" variant="success" alternativeText="call" title="call" onclick="{!c.atenderLigacao}" />
+
+                                                        <aura:set attribute="else">
+                                                            <lightning:buttonIconStateful iconName="utility:muted" size="large" disabled="{!v.statusLigacao == 'setup'}" selected="{! v.ligacaoMutada }" onclick="{! c.mutarLigacao }" title="Mutar/Desmutar chamada" alternativeText="muted" />
+                                                            <lightning:buttonIcon iconName="utility:pause" size="large" disabled="{!v.statusLigacao == 'setup'}" alternativeText="pause" title="Pausar chamada" onclick="{!c.pausarLigacao}" />
+                                                            <lightning:buttonIcon iconName="utility:end_call" class="destructive" size="large" variant="destructive" alternativeText="end_call" title="Finalizar ligação" onclick="{!c.finalizarLigacao}" />
+                                                            <lightning:buttonIcon iconName="utility:change_owner" size="large" variant="brand" disabled="{!v.statusLigacao == 'setup'}" alternativeText="change_owner" title="Tranfirir chamada" onclick="{!c.abrirAreaTransferencia}" />
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:set>
+                        </aura:if>
+                    </div>
+
+                    <aura:set attribute="else">
+                        <div class="editarRamal">
+                            <!--Tela para ela informar os dados de login do callbox-->
+                            <div class="centerHeader">
+                                <h1>Efetuar Login L5 Callbox</h1>
+                            </div>
+
+                            <lightning:input label="Ramal: " value="{!v.ramal}" />
+                            <lightning:input label="Senha: " value="{!v.senhaCallbox}" type="password" />
+                            <br />
+                            <lightning:button class="largeButton" variant="brand" label="Salvar e Logar" title="Salvar e Logar" onclick="{! c.logarCallbox }" />
+                        </div>
+                    </aura:set>
+                </aura:if>
+            </aura:if>
+        </div>
+    </lightning:card>
+</aura:component>

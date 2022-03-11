@@ -1,0 +1,26 @@
+<aura:component 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <!--Atributos-->
+
+    <aura:attribute name="leadRecord" type="Object"/>
+
+    <!--Manipuladores-->
+    
+    <aura:handler name="change" value="{!v.leadRecord}" action="{!c.doInit}" />
+
+    <!--Conteúdo-->
+
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+
+    <aura:registerEvent name="CallboxAuraEvent" type="c:CallboxAuraEvent" />
+
+    <force:recordData aura:id="recordLoader"
+        recordId="{!v.recordId}"
+        fields="Phone,MobilePhone"
+        targetFields="{!v.leadRecord}"
+    />
+
+    <lightning:spinner />
+</aura:component>

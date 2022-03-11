@@ -1,0 +1,11 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_4-of-4">
+            <div>
+                <lightning-input autocomplete="false" variant="label-hidden" value={searchKey} type="search"
+                    onchange={handleChange} onfocus={handleChange} placeholder="Digite para pesquisar..." disabled={disabled}>
+                </lightning-input>
+            </div>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,70 @@
+.THIS {
+}
+.THIS .conteudo
+{
+    padding: 20px;
+}
+.THIS .labelTextArea
+{
+    margin-bottom: 2px !important;
+}
+.THIS .textArea label
+{
+    display: none !important;
+}
+
+.THIS .dualListbox .slds-form-element__label
+{
+    display: none !important;
+}
+
+.THIS .pergunta
+{
+    padding-bottom: 10px !important;
+}
+
+.THIS .footerBtn
+{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.THIS .required
+{
+    color: red !important;
+    font-size: 10px;
+}
+
+.THIS .coletarInformacoesAdicionais
+{
+    border: 1px solid rgb(221 219 218);
+    border-radius: 0px 0px 5px 5px;
+    padding: 5px;
+}
+
+.THIS .error .textArea textarea
+{
+    border: 1px solid red !important;
+}
+
+.THIS .error .slds-dueling-list__options
+{
+    border: 1px solid red !important;
+}
+
+.THIS .error select
+{
+    border: 1px solid red !important;
+}
+
+.THIS .rich-margin{
+    margin-bottom: 10px !important; 
+}
+
+.THIS .esconder
+{
+    display: none;
+}

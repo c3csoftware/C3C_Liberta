@@ -1,0 +1,31 @@
+<template>
+    <div class="calendar">
+      <div class="front">
+        <div id="today-date" class="current-date"><h1>{today}</h1></div>
+  
+        <div class="current-month">
+          <ul class="week-days">
+            <li>DOM</li>
+            <li>SEG</li>
+            <li>TER</li>
+            <li>QUA</li>
+            <li>QUI</li>
+            <li>SEX</li>
+            <li>SAB</li>
+          </ul>
+  
+          <div class="days">
+            <template iterator:it={daysLastMonth}>
+              <div key={it.value}><span class="last-month">{it.value}</span></div>
+            </template>
+            <template iterator:it={days}>
+              <div key={it.value.day}><span class={it.value.isActive} onclick={handleDayClick}>{it.value.day}</span></div>
+            </template>
+            <template iterator:it={daysNextMonth}>
+              <div key={it.value}><span class="last-month">{it.value}</span></div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>

@@ -1,0 +1,48 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<!--Atributos-->
+
+    <aura:attribute name="inficarAssessor" type="Boolean" default="false"/>
+    
+    <!--Manipuladores-->
+    
+    <!--Conteúdo-->
+    <lightning:navigation aura:id="navLink"/>
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+        
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Fechar" onclick="{! c.handleClose }">
+                        <lightning:icon iconName="utility:close" alternativeText="Fechar" title="Fechar" />
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Novo Lead</h2>
+                </header>
+                <lightning:recordEditForm aura:id="recordEditForm" objectApiName="Lead" onsuccess="{! c.handleSuccess}">
+                	<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:messages />
+                        <!--<ui:outputText value="Informe o nome da base no assunto para consultas futuras e, caso queira, envie uma observação na descrição."/>-->
+                        <lightning:layout>
+                            <lightning:layoutItem size="6" padding="around-small">
+                                <lightning:inputField fieldName="Name" required = "true" />
+                                <lightning:inputField fieldName="Company" required = "true" />
+                            </lightning:layoutItem>
+                            <lightning:layoutItem size="6" padding="around-small">
+                                <lightning:inputField fieldName="Phone" required = "true" />
+                                <lightning:inputField fieldName="CPF__c"/>
+                                <lightning:inputField fieldName="CNPJ__c"/>
+                                <lightning:inputField fieldName="ValorInvestidoColetado__c"/>
+                                <aura:if isTrue="{!v.inficarAssessor}">
+                                	<lightning:inputField fieldName="AssessorIndicado__c"/>
+								</aura:if>
+                            </lightning:layoutItem>
+                        </lightning:layout>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-m-top_small" variant="neutral" name="cancel" label="Cancelar" onclick="{! c.handleClose }"/>
+                        <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="enviar" label="Salvar" />
+                    </footer>
+                </lightning:recordEditForm>
+            </div>
+	</section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</aura:component>

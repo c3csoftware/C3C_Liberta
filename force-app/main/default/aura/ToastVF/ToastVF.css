@@ -1,0 +1,13 @@
+.THIS {
+    position: fixed !important;
+}
+
+.THIS .slds-icon_container
+{
+    margin-right: 10px !important;
+}
+
+.THIS h4
+{
+    font-size: 1.3em;
+}

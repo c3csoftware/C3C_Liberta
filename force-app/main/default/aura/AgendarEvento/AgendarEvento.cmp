@@ -1,0 +1,193 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+    <!--Atributos-->
+
+    <!--Atributo que irá armazenar o id da fila selecionada-->
+    <aura:attribute name="idFila" type="String" />
+
+    <aura:attribute name="recordId" type="String" />
+
+    <aura:attribute name="idEvento" type="String" />
+    <aura:attribute name="idProprietarioEvento" type="String" />
+
+    <!--Atributos que irão armazenar a data e hora minima, e data e hora máxima-->
+    <aura:attribute name="dataEHoraMinima" type="Datetime" />
+    <aura:attribute name="dataEHoraMaxima" type="Datetime" />
+
+    <!--Atributo que irá armazenar as datas e horários disponíveis-->
+    <aura:attribute name="datasDisponiveis" type="List" />
+    <aura:attribute name="agendaDeUsuarios" type="List" />
+    <aura:attribute name="horariosDisponiveis" type="List" />
+
+    <aura:attribute name="listaDatasDisponiveis" type="List" />
+
+    <!--Atributo que irá definir em qual passo está-->
+    <aura:attribute name="passo" type="String" default="definirPeriodo" />
+
+    <!--Atributo que irá armazenar a data selecionada-->
+    <aura:attribute name="dataDisponivelSelecionada" type="String" />
+    <aura:attribute name="dataConvertida" type="String" />
+    <aura:attribute name="horarioSelecionado" type="String" />
+
+    <!-- Atributo para armazenar a duração do evento -->
+    <aura:attribute name="duracaoSelecionado" type="String" />
+    <aura:attribute name="duracoesDisponiveis" type="List"
+        default="[{ label: '00:30', value: '00:30' }, { label: '01:00', value: '01:00' }]" />
+
+    <!-- Atributo para armazenar o assunto do evento -->
+    <aura:attribute name="assunto" type="String" default="Qualificação do Assessor" />
+
+    <!-- Atributo para armazenar a descrição do evento -->
+    <aura:attribute name="descricao" type="String" />
+
+    <!-- Atributo para armazenar o assessor do evento -->
+    <aura:attribute name="nomeAssessor" type="String" />
+
+    <!-- Atributo para armazenar o id do Assessor Indicado -->
+    <aura:attribute name="assessorIndicado" type="String" />
+
+    <!-- Atributo que irá disparar o spinner caso seu valor seja true -->
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+
+    <!--Manipuladores-->
+    <aura:handler name="change" value="{!v.dataDisponivelSelecionada}" action="{!c.definirHorariosDisponiveis}" />
+    <aura:handler name="change" value="{!v.horarioSelecionado}" action="{!c.limparAssunto}" />
+    <aura:handler name="change" value="{!v.duracaoSelecionado}" action="{!c.limparAssunto}" />
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.verificarSePopEstaPreenchido}" /> -->
+
+    <!--Serviços Back-->
+    <c:callService service="CalendarioDeEventosService" aura:id="CalendarioDeEventosService" />
+    <c:callService service="EventService" aura:id="EventService" />
+    <c:callService service="EventRelationService" aura:id="EventRelationService" />
+    <c:callService service="TaskService" aura:id="TaskService" />
+
+    <!--Conteudo-->
+
+    <!-- HTML -->
+    <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 20px !important;
+        }
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+        .slds-p-right_small, .slds-p-right--small{
+        padding-right: 0px !important;
+        }
+        .slds-modal__footer{
+        display: none;
+        }
+    </aura:html>
+
+    <lightning:layout multipleRows="true">
+        <!-- Validação para disparo de spinner em tela -->
+        <aura:if isTrue="{!v.spinner}">
+            <lightning:spinner alternativeText="Carrengando..." size="medium" />
+        </aura:if>
+        <lightning:layoutItem size="12">
+            <!--Passo de definir périodo-->
+            <aura:if isTrue="{!v.passo == 'definirPeriodo'}">
+                <lightning:layout multipleRows="true">
+                    <!--Campo de pesquisa para buscar filas.-->
+                    <aura:if isTrue="{!v.assessorIndicado == undefined}">
+                        <lightning:layoutItem size="12">
+                            <c:customLookup name='lookupFila' iconname="standard:service_crew_member" objectName="Fila__c"
+                                searchfields="['Name']" formFields="['Name']" fieldLabel="Name" labelInput="Fila: " where=""
+                                onselectedrec='{!c.manipulandoIdFila}' required="true" />
+                        </lightning:layoutItem>
+                    </aura:if>
+                    <!--Campos de data e hora mínimo e máximo-->
+                    <lightning:layoutItem size="12" class="center">
+                        <lightning:input type="datetime" value="{!v.dataEHoraMinima}" label="Data e hora mínima"
+                            dateStyle="short" format="DD/MM/YYYY"
+                            pattern="([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))" required="true" />
+                        <lightning:input type="datetime" value="{!v.dataEHoraMaxima}" label="Data e hora máxima"
+                            dateStyle="short" format="DD/MM/YYYY"
+                            pattern="([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))" required="true" />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </aura:if>
+            <!--Passo de definir data e horário do inicio do evento-->
+            <aura:if isTrue="{!v.passo == 'mostrarDatasHorariosDisponiveis'}">
+                <lightning:layout multipleRows="true">
+                    <div
+                        class="{!v.dataDisponivelSelecionada == undefined ? 'form-section-widthMax' : 'form-section form-section-widthMax'}">
+                        <div class="form-section-widthMax form-section-scroll">
+                            <lightning:layoutItem size="12">
+                                <c:AreaDeSelecaoLista rotulo="Selecione uma das datas disponíveis: "
+                                    listaOpcoes="{!v.listaDatasDisponiveis}"
+                                    valorSelecionado="{!v.dataDisponivelSelecionada}" />
+                            </lightning:layoutItem>
+                        </div>
+                        <div class="form-section-widthMax">
+                            <aura:if isTrue="{!v.dataDisponivelSelecionada != undefined}">
+                                <lightning:layoutItem size="12" padding="horizontal-small">
+                                    <c:C3c_SelectDropDown label="Selecione um dos horários disponíveis: "
+                                        options="{!v.horariosDisponiveis}" valueSelected="{!v.horarioSelecionado}"
+                                        required="true" />
+                                </lightning:layoutItem>
+                                <aura:if isTrue="{!!!v.horarioSelecionado}">
+                                    <lightning:layoutItem size="12" padding="horizontal-small">
+                                        <c:C3c_SelectDropDown label="Selecione uma duração para o evento: "
+                                            options="{!v.duracoesDisponiveis}" valueSelected="{!v.duracaoSelecionado}"
+                                            required="true" />
+                                    </lightning:layoutItem>
+                                    <aura:if isTrue="{!!!v.duracaoSelecionado}">
+                                        <lightning:layoutItem size="12" padding="horizontal-small">
+                                            <lightning:input name="assunto" label="Digite o assunto do evento:"
+                                                value="{!v.assunto}" disabled="true" />
+                                        </lightning:layoutItem>
+                                        <lightning:layoutItem size="12" padding="horizontal-small">
+                                            <lightning:textarea name="descricao" label="Digite a descrição do evento:"
+                                                placeholder="Ex: Liberado a entrada de familiares"
+                                                value="{!v.descricao}" />
+                                        </lightning:layoutItem>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:if>
+                        </div>
+                    </div>
+                </lightning:layout>
+            </aura:if>
+            <!--Passo de definir périodo-->
+            <aura:if isTrue="{!v.passo == 'salvarEvento'}">
+                <lightning:card>
+                    <aura:set attribute="title">
+                        <lightning:icon iconName="utility:connected_apps" size="small" />
+                        Informações do Evento
+                    </aura:set>
+                    <aura:set attribute="footer">
+                        <lightning:badge label="{!'Assessor: ' + v.nomeAssessor}" />
+                        <lightning:badge label="{!'Data: ' + v.dataConvertida}" />
+                        <lightning:badge label="{!'Horário: ' + v.horarioSelecionado}" />
+                    </aura:set>
+                    Veja aqui as informações sobre o evento que foi gerado.
+                </lightning:card>
+                <lightning:layoutItem size="12">
+                    <lightning:button class="center" variant="brand" label="Finalizar" title="Finalizar"
+                        onclick="{!c.fecharGuia}" />
+                </lightning:layoutItem>
+            </aura:if>
+        </lightning:layoutItem>
+        <aura:if isTrue="{!v.passo != 'salvarEvento'}">
+            <aura:if isTrue="{!v.passo == 'mostrarDatasHorariosDisponiveis'}">
+                <lightning:layoutItem size="6">
+                    <lightning:button class="widthAuto" variant="brand" label="Voltar" title="Voltar"
+                        onclick="{!c.passoAnterior}" />
+                </lightning:layoutItem>
+            </aura:if>
+            <lightning:layoutItem size="{!v.passo == 'mostrarDatasHorariosDisponiveis' ? 6 : 12}">
+                <lightning:button class="{!v.passo == 'mostrarDatasHorariosDisponiveis' ? 'widthAuto' : 'center'}"
+                    variant="brand" label="{!v.passo == 'mostrarDatasHorariosDisponiveis' ? 'Salvar' : 'Próximo'}"
+                    title="{!v.passo == 'mostrarDatasHorariosDisponiveis' ? 'Salvar' : 'Próximo'}"
+                    onclick="{!c.proximoPasso}"
+                    disabled="{!or(or(!!!v.idFila, or(!!!v.dataEHoraMaxima, !!!v.dataEHoraMinima)) ? true : false, and(not(empty(v.listaDatasDisponiveis)), !!!v.duracaoSelecionado) ? true : false)}" />
+            </lightning:layoutItem>
+        </aura:if>
+    </lightning:layout>
+</aura:component>

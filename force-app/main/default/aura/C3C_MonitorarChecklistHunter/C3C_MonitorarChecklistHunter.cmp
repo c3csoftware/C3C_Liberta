@@ -1,0 +1,13 @@
+<aura:component
+  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+  access="global">
+
+  <!-- Atributos -->
+  <aura:attribute name="mostrarAgendador" type="Boolean" default="false" />
+  <aura:attribute name="recordId" type="String" />
+
+  <!--Manipuladores-->
+  <aura:handler event="c:C3C_FechouChecklistHunter" action="{!c.atribuirMostrarAgendador}" />
+  <lightning:quickActionAPI aura:id="quickActionAPI" />
+
+</aura:component>

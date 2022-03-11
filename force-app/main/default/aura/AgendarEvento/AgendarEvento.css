@@ -1,0 +1,32 @@
+.THIS {
+}
+
+.THIS .center
+{
+    display: flex;
+    margin-top: 10px;
+    flex-direction: column;
+    width: 100%;
+}
+
+.THIS .widthAuto
+{
+    margin: 15px 15px 0px;
+    width: 90%;
+}
+
+.THIS .form-section
+{
+    display: flex;
+}
+
+.THIS .form-section-widthMax
+{
+    width: 100%;
+}
+
+.THIS .form-section-scroll
+{
+    overflow-y: scroll;
+    max-height: 235px;
+}

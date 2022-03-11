@@ -1,0 +1,150 @@
+.THIS {
+    -webkit-touch-callout: none;
+   -webkit-user-select: none;
+   -khtml-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+}
+.THIS .centerText{
+    display: flex;
+}
+.THIS .calendario{
+    padding: 10px;
+}
+.THIS .selecionado{
+    background: #3cc2b3 !important;
+}
+.THIS .selecionado span{
+    background: none !important;
+    color: white !important;
+}
+.THIS .cursor-pointer:hover{
+    cursor: pointer;
+}
+.THIS .selectDay span{
+    background: none !important;
+    color: white;
+}
+.THIS .selecionado2{
+    opacity: 0.5;
+}
+.THIS .selecionado3{
+    border: 1px solid #3cc2b3!important;
+}
+.THIS .selecionado3 .centerText{
+    background-color: #3cc2b3;
+    color: white;
+}
+.THIS th{
+    border-bottom: 1px solid #b0adab;
+}
+ 
+.THIS select{
+    padding: 5px 15px;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+}
+
+.THIS option{
+    border: 1px solid #d4d4d4 !important;
+    padding: 5px !important;
+}
+
+.THIS .inputAno{
+    padding: 5px 15px;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    width: 85px;
+    margin-left: 10px;
+}
+
+.THIS table{
+    background: white !important;
+}
+
+.THIS .lineHeader{
+    display: flex;
+}
+
+.THIS .lineHeader div{
+    flex: 1;
+    margin: 2.5px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.THIS .lineBody{
+    display: flex;
+}
+ 
+.THIS .calendarDay{
+    background: white;
+    flex: 1;
+    margin: 2.5px;
+    border: 1px solid #dededf !important;
+    border-radius: 3px;
+    padding: 5px;
+    position: relative;
+    box-shadow: 1px 1px 2px #dededf;
+}
+
+.THIS .calendarDay:after {
+    content: "";
+    display: block;
+    padding-bottom: 70%;
+}
+
+.THIS .calendarDay .slds-day{
+    float: right;
+    background: white;
+    z-index: 12;
+    position: relative;
+    padding: 2.5px;
+    border-radius: 25px;
+    width: 20px;
+    text-align: center;
+}
+
+.THIS .listEvents{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.THIS .listEvents span{
+    font-size: 8px;
+    background: gainsboro;
+    padding: 2px 10px 2px 5px;
+    border-radius: 0 10px 10px 0;
+    margin-bottom: 1px;
+    margin-left: -5px;
+    color: white !important;
+    white-space: nowrap;
+    width: 12em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.THIS .slds-is-today span{
+    color: #3cc2b3;
+}
+
+.THIS .headerCalendar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.THIS .headerCalendar h1{
+    color: #3cc2b3;
+    font-size: x-large;
+    font-weight: lighter;
+}
+
+.THIS .red{ background: #b51f1f !important;}
+.THIS .green{ background: #21945a !important;}
+.THIS .blue{ background: #0c3299 !important;}
+.THIS .primaryColor{ background: #268177 !important;}

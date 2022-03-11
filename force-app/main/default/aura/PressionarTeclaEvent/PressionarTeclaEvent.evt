@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT">
+    <!--Atributos-->
+    <aura:attribute type="String" name="tecla" />    
+</aura:event>

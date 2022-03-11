@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+access="global"> 
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="spinner" type="Boolean" default="true" />
+
+    <!--Serviços Back-->
+    <c:callService service="AceitarLeadFilhoExtension" aura:id="AceitarLeadFilhoExtension" />
+
+    <aura:if isTrue="{!v.spinner}">
+        <lightning:spinner alternativeText="Carrengando..." size="medium" />
+    </aura:if>
+</aura:component>

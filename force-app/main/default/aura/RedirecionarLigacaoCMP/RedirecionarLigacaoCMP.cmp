@@ -1,0 +1,22 @@
+<aura:component 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <!--Atributos-->
+
+    <aura:attribute name="idRegistroLigacao" type="String" />
+    <aura:attribute name="nomeObjeto" type="String" />
+    <aura:attribute name="celularLigacao" type="String" />  
+
+    <!--Manipuladores-->
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Serviços backend-->
+
+    <c:callService service="TaskCallService" aura:id="TaskCallService" />
+
+    <!--Conteudo-->
+
+    <lightning:spinner size="large" />
+</aura:component>

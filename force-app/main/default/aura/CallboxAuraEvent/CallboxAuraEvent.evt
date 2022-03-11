@@ -1,0 +1,5 @@
+<aura:event type="APPLICATION">
+    <!--Atributos-->
+    <aura:attribute name="acao" type="String" />
+    <aura:attribute name="parametros" type="object" />
+</aura:event>

@@ -1,0 +1,80 @@
+<aura:component implements="flexipage:availableForAllPageTypes" access="global">
+  <aura:attribute name="tipoDeErro" type="String" />
+  <aura:attribute name="idLead" type="String" />
+  <aura:attribute name="erro" type="String" />
+  <aura:attribute name="displayModalErro" type="Boolean" default="false" />
+  <aura:attribute name="displayBotaoConverter" type="Boolean" default="false" />
+  <aura:attribute name="displayToast" type="Boolean" default="false" />
+  <aura:attribute name="spinner" type="Boolean" default="true" />
+  <aura:attribute name="fecharPagina" type="Boolean" default="false" />
+
+  <aura:handler name="init" value="{!this}" action="{!c.init}" />
+  <aura:handler name="change" value="{!v.fecharPagina}" action="{!c.closeTab}" />
+  <aura:registerEvent name="C3C_FecharGuiaVF" type="c:C3C_FecharGuiaVF" />
+
+  <c:callService service="ConverterLeadService" aura:id="ConverterLeadService" />
+
+  <aura:if isTrue="{!v.displayModalErro}">
+    <aura:if isTrue="{!v.spinner}">
+      <lightning:spinner alternativeText="Carrengando..." size="medium" />
+    </aura:if>
+    <div>
+      <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+              onclick="{!c.closeTab}">
+              <lightning:icon iconName="utility:close" size="small" variant="neutral" />
+              <span class="slds-assistive-text">Close</span>
+            </button>
+          </header>
+
+          <div class="slds-modal__content slds-p-around_medium alignLeft" id="modal-content-id-1">
+            <aura:if isTrue="{! and(!v.displayBotaoConverter, v.displayModalErro)}">
+              <p>{!v.tipoDeErro}</p>
+            </aura:if>
+            <aura:if isTrue="{!v.displayBotaoConverter}">
+              <p><b>Atenção:</b> Você está prestes a converter um CPF/CNPJ que já está na base!</p>
+              <p>Este ato irá sobrescrever as informações da Conta que foram obtidas do Active até agora.</p>
+              <p><b>Você tem certeza que deseja continuar?</b></p>
+            </aura:if>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning:button label="Cancelar" variant="brand" class="slds-m-top--medium" onclick="{!c.closeTab}" />
+            <aura:if isTrue="{!v.displayBotaoConverter}">
+              <lightning:button label="Converter" variant="brand" class="slds-m-top--medium"
+                onclick="{!c.realizarConversao}" />
+            </aura:if>
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+  </aura:if>
+
+  <aura:if isTrue="{!v.displayToast}">
+    <div>
+      <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+          <header class="slds-modal__header">
+            <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close"
+              onclick="{!c.closeTab}">
+              <lightning:icon iconName="utility:close" size="small" variant="neutral" />
+              <span class="slds-assistive-text">Close</span>
+            </button>
+          </header>
+
+          <div class="slds-modal__content slds-p-around_medium alignLeft" id="modal-content-id-1">
+            <p>{!v.erro}</p>
+          </div>
+          <footer class="slds-modal__footer">
+            <lightning:button label="Cancelar" variant="brand" class="slds-m-top--medium" onclick="{!c.closeTab}" />
+          </footer>
+        </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+  </aura:if>
+</aura:component>

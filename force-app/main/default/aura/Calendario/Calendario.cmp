@@ -1,0 +1,119 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global">
+    <aura:attribute type="Object" name="diasMes" />
+    <aura:attribute type="Decimal" name="mes" />
+    <aura:attribute type="String" name="mesExtenso" />
+    <aura:attribute type="Decimal" name="ano" />
+    <aura:attribute type="List" name="eventos" />
+
+    <aura:attribute type="List" name="periodsFiltro"/>
+    <aura:attribute type="List" name="mesesFiltro"/>
+    <aura:attribute type="List" name="mesesAno" />
+    
+    <aura:attribute type="Boolean" name="viewPage" default="true"/>
+
+    <aura:attribute type="Decimal" name="sizeCalendar" default="4" />
+
+    <!--Atributos para filtrar as datas que serão visualizadas-->
+    <aura:attribute type="List" name="mesesVisiveis" />
+    <aura:attribute type="List" name="dataVisiveis" />
+    <aura:attribute type="Decimal" name="minimoAnoVisivel" default="0" /> 
+    <aura:attribute type="Decimal" name="maximoAnoVisivel" /> 
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:handler name="change" value="{!v.eventos}" action="{!c.init}" />
+
+    <aura:registerEvent name="selectDataCalendario" type="c:SelectDataCalendario" />
+
+    <aura:if isTrue="{!v.viewPage}">
+        <lightning:layoutItem size="{!v.sizeCalendar}">
+            <div aria-hidden="false" name="{!v.mesExtenso}" aria-label="Date picker: June" class="slds-datepicker calendario" role="dialog">
+                <div class="headerCalendar">
+                    <div>
+                        <select onchange="{!c.onChangeMes}">
+                            <aura:iteration items="{!v.mesesAno}" var="mes">
+                                <aura:if isTrue="{!mes.value == v.mes}">
+                                    <option value="{!mes.value}" selected="true" disabled="{!mes.disabled}">{!mes.label}</option>
+                                    <aura:set attribute="else">
+                                        <option value="{!mes.value}" disabled="{!mes.disabled}">{!mes.label}</option>
+                                    </aura:set>
+                                </aura:if>
+                            </aura:iteration>
+                        </select>
+                        {!v.minimoAnoVisivel}
+                        {!v.maximoAnoVisivel}
+                        <aura:if isTrue="{!v.maximoAnoVisivel != undefined}">
+                            hmmm
+                            <input class="inputAno" type="number" value="{!v.ano}" min="{!v.minimoAnoVisivel}" max="{!v.maximoAnoVisivel}" onchange="{!c.onChangeAno}" />
+                            <aura:set attribute="else">
+                                uai
+                                <input class="inputAno" type="number" value="{!v.ano}" onchange="{!c.onChangeAno}" />
+                            </aura:set>
+                        </aura:if>
+                    </div>
+                    <div>
+                        <h1>{!v.mesExtenso}, {!v.ano}</h1>
+                    </div>
+                </div>
+                <div class="calendar">
+                    <div class="header">
+                        <div class="lineHeader">
+                            <div id="Domingo" scope="col">
+                                <span title="Domingo">Dom</span>
+                            </div>
+                            <div id="Segunda" scope="col">
+                                <span title="Segunda">Seg</span>
+                            </div>
+                            <div id="Terca" scope="col">
+                                <span title="Terca">Ter</span>
+                            </div>
+                            <div id="Quarta" scope="col">
+                                <span title="Quarta">Qua</span>
+                            </div>
+                            <div id="Quinta" scope="col">
+                                <span title="Quinta">Qui</span>
+                            </div>
+                            <div id="Sexta" scope="col">
+                                <span title="Sexta">Sex</span>
+                            </div>
+                            <div id="Sabado" scope="col">
+                                <span title="Sabado">Sab</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="body">
+                        <aura:iteration items="{!v.diasMes}" var="mes">
+                            <aura:iteration items="{!mes.dias}" indexVar="index">
+                                <aura:if isTrue="{!index%7 == 0}">
+                                    <div class="lineBody">
+                                        <aura:iteration items="{!mes.dias}" start="{!index}" end="{!index+7}" var="dia">
+                                            <div aria-disabled="{!dia.disabled}" name="{!dia.numero}" style="{!dia.selecionado ? dia.cor : ''}" aria-selected="false" 
+                                                class="{! dia.disabled ? 
+                                                            'slds-disabled-text calendarDay' :  
+                                                                and(dia.diaAtual, dia.selecionado) ? 
+                                                                    'cursor-pointer selectDay slds-is-today calendarDay' : 
+                                                                    dia.diaAtual ? 
+                                                                        'cursor-pointer slds-is-today calendarDay' :
+                                                                        dia.selecionado ? 
+                                                                            'selectDay calendarDay' :
+                                                                            'cursor-pointer calendarDay'
+                                                        }" role="gridcell" onclick="{! dia.disabled ? '' : c.selectDia}">
+                                                <span class="slds-day" name="{!dia.numero}">{!dia.numero}</span>
+                                                <div class="listEvents">
+                                                    <aura:iteration items="{!dia.eventos}" start="{!indexEvento}" end="3" var="evento">
+                                                        <span class="{!evento.status == 'Agendada' ? 
+                                                                        'blue' : evento.status == 'Iniciada' ? 
+                                                                        'green' : evento.status == 'Atrasada' ? 'red' : 'primaryColor'}">{!evento.nomeEtapa}</span>
+                                                    </aura:iteration>
+                                                </div>
+                                            </div>
+                                        </aura:iteration>
+                                    </div>
+                                </aura:if>
+                            </aura:iteration>
+                        </aura:iteration>
+                    </div>
+                </div>
+            </div>
+        </lightning:layoutItem>
+    </aura:if>
+</aura:component>

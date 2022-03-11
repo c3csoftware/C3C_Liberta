@@ -1,0 +1,27 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global"
+>
+    <lightning:empApi aura:id="empApi"/>
+
+    <!--Atributos-->
+    <aura:attribute name="carregandoPagina" type="Boolean" default="true" />
+
+    <aura:attribute name="parametrosURL" type="String" default=""/>
+    <aura:attribute name="identificacaoGuia" type="String" />
+
+    <aura:attribute name="focadoNaGuia" type="Boolean" default="false" />
+
+    <!--Serviços Back-->
+
+    <!--Manipuladores-->
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler event="c:CallboxAuraEvent" action="{!c.ligarPaginaDetalhes}" />
+
+    <!--Contéudo-->
+    
+    <lightning:utilityBarAPI aura:id="utilitybar" />
+
+    <iframe class="pagina open" src="{!'/apex/RTCL5?identificacaoGuia='+v.identificacaoGuia+v.parametrosURL}" allow="microphone *" />
+</aura:component>

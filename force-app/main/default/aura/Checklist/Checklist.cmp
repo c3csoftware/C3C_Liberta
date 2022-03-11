@@ -1,0 +1,101 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+    <!--Atributos-->
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="tipoTarefa" type="String" />
+    <aura:attribute name="listaPerguntas" type="List" />
+    <aura:attribute name="spinner" type="Boolean" default="false" />
+
+    <lightning:workspaceAPI aura:id="workspace" />
+
+    <!--Serviços Back-->
+    <c:callService service="ChecklistService" aura:id="ChecklistService" />
+    <c:callService service="AtualizarTarefaService" aura:id="AtualizarTarefaService" />
+
+    <!--Manipuladores-->
+    <aura:handler name="changeSelectDropDown" event="c:ChangeSelectDropDown" action="{!c.alteracaoRespostas}" />
+
+    <!-- Eventos -->
+    <aura:registerEvent name="C3C_FechouChecklistHunter" type="c:C3C_FechouChecklistHunter" />
+
+    <!--Conteúdo-->
+    <lightning:card>
+        <div class="conteudo">
+            <aura:if isTrue="{!not(empty(v.listaPerguntas))}">
+                <aura:if isTrue="{!v.spinner}">
+                    <lightning:spinner alternativeText="Carrengando..." size="medium" />
+                </aura:if>
+                <div class="rich-margin">
+                    <c:C3C_ColocarPop recordId="{!v.recordId}" />
+                </div>
+                <aura:iteration items="{!v.listaPerguntas}" var="pergunta">
+                    <div
+                        class="{!(pergunta.erro ? 'pergunta error' : 'pergunta')+(and(pergunta.pergunta.perguntaRelacionadaPergunta == true, pergunta.visualizarRelacioada != true) ? ' esconder' : '')}">
+                        <!--Pergunta dissertativa-->
+                        <aura:if isTrue="{!pergunta.pergunta.tipo == 'Dissertativa'}">
+                            <label>
+                                <aura:if isTrue="{!pergunta.pergunta.obrigatorio}">
+                                    <span class="required">*</span>
+                                </aura:if>
+                                {!pergunta.pergunta.pergunta}
+                            </label>
+                            <lightning:textarea class="textArea" required="{!pergunta.pergunta.obrigatorio}"
+                                value="{!pergunta.respostaDissertativa}" onchange="{!c.alteracaoRespostas}" />
+                        </aura:if>
+
+                        <!--Pergunta moeda-->
+                        <aura:if isTrue="{!pergunta.pergunta.tipo == 'Moeda'}">
+                            <lightning:input type="number" value="{!pergunta.respostaDissertativa}"
+                                label="{!pergunta.pergunta.pergunta}" formatter="currency" step="0.01"
+                                required="{!pergunta.pergunta.obrigatorio}" onchange="{!c.alteracaoRespostas}" />
+                        </aura:if>
+
+                        <!--Pergunta de única escolha-->
+                        <aura:if isTrue="{!pergunta.pergunta.tipo == 'Única escolha'}">
+                            <c:C3c_SelectDropDown required="{!pergunta.pergunta.obrigatorio}"
+                                label="{!pergunta.pergunta.pergunta}" valueSelected="{!pergunta.respostaAlternativa}"
+                                options="{!pergunta.listaDeRespostas}" />
+                        </aura:if>
+
+                        <!--Pergunta de múltipla escolha-->
+                        <aura:if isTrue="{!pergunta.pergunta.tipo == 'Múltipla escolha'}">
+                            <label>
+                                <aura:if isTrue="{!pergunta.pergunta.obrigatorio}">
+                                    <span class="required">*</span>
+                                </aura:if>
+                                {!pergunta.pergunta.pergunta}
+                            </label>
+                            <lightning:dualListbox class="dualListbox" label="{!pergunta.pergunta.pergunta}"
+                                required="{!pergunta.pergunta.obrigatorio}" sourceLabel="Opções"
+                                selectedLabel="Opções selecionadas" options="{!pergunta.listaDeRespostas}"
+                                value="{!pergunta.listaRespostasMultiplaEscolhaSelecionadas}"
+                                onchange="{!c.alteracaoRespostas}" />
+                        </aura:if>
+
+                        <!--Coletar as informações  adicionar-->
+                        <aura:if isTrue="{!pergunta.listIntanciaRespostaComInformacoes.length > 0}">
+                            <div class="coletarInformacoesAdicionais">
+                                <aura:iteration items="{!pergunta.listIntanciaRespostaComInformacoes}"
+                                    var="coletaInformacao">
+                                    <label>Coletar mais infomações para resposta "{!coletaInformacao.resposta.label}":
+                                    </label>
+                                    <lightning:textarea class="textArea"
+                                        value="{!coletaInformacao.instanciaRespostaMapper.respostaDissertativa}" />
+                                </aura:iteration>
+                            </div>
+                        </aura:if>
+                    </div>
+                </aura:iteration>
+
+                <div class="footerBtn">
+                    <lightning:button variant="brand" label="Salvar Checklist" title="Salvar Checklist"
+                        onclick="{!c.salvarChecklist}" />
+                </div>
+                <aura:set attribute="else">
+                    <p>Checklist não possui perguntas.</p>
+                </aura:set>
+            </aura:if>
+        </div>
+    </lightning:card>
+</aura:component>

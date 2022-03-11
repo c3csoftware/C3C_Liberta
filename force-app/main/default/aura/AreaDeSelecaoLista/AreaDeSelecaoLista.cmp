@@ -1,0 +1,20 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+
+    <!--Atributos-->
+    <aura:attribute type="List" name="listaOpcoes" />
+    <aura:attribute type="String" name="valorSelecionado" />
+    <aura:attribute type="String" name="rotulo" />
+
+    <!--Manipuladores-->
+
+    <!--Conteudo-->
+
+    <label>{!v.rotulo}</label>
+    <div class="lista">
+        <aura:iteration items="{!v.listaOpcoes}" var="opcao">
+            <div class="{!opcao.selecionado ? 'selecionado item' : 'item'}" onclick="{!c.selecionarLinha}">
+                <span data-value="{!opcao.value}">{!opcao.label}</span>
+            </div>
+        </aura:iteration>
+    </div>
+</aura:component>

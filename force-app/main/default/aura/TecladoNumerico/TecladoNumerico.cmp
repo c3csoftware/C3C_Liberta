@@ -1,0 +1,31 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global"
+>
+    <!--Atributos-->
+    <aura:attribute name="conjuntoTeclas" type="List" />
+
+    <!--Serviços Back-->
+
+    <!--Manipuladores-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Eventos-->
+    <aura:registerEvent name="pressionarTeclaEvent" type="c:PressionarTeclaEvent" />
+
+    <!--Conteúdo-->
+    <div class="discador">
+        <aura:iteration items="{!v.conjuntoTeclas}" var="conjunto">
+            <div class="conjuntoTeclas">
+                <aura:iteration items="{!conjunto}" var="tecla">
+                    <div class="tecla" onclick="{!c.precionarTecla}" data-value="{!tecla.valor}">{!tecla.rotulo}</div>
+                </aura:iteration>
+            </div>
+        </aura:iteration>
+        <div class="conjuntoTeclas">
+            <div class="tecla teclaEspecial" onclick="{!c.precionarTecla}" data-value="limpar"><lightning:icon iconName="utility:close" size="x-small" alternativeText="limpar" title="limpar" /></div>
+            <div class="tecla" onclick="{!c.precionarTecla}" data-value="0">0</div>
+            <div class="tecla teclaEspecial" onclick="{!c.precionarTecla}" data-value="apagar"><lightning:icon iconName="utility:undo" size="x-small" alternativeText="apagar" title="apagar" /></div>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" access="global">
+    <aura:attribute name="reference" type="String"/>
+    <aura:attribute name="valueSelected" type="String" />  
+</aura:event>

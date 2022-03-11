@@ -1,0 +1,24 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:attribute name="recordId" type="String" />
+    
+    <aura:attribute name="classificacaoEstrela" type="List" />
+
+    <c:callService service="ContaService" aura:id="ContaService" />
+
+    <aura:html tag="style">
+        .slds-icon-custom-custom11 {
+            background-color: #1ed760;
+        	margin: 5px;
+        }
+    </aura:html>
+    
+    <lightning:layout>
+        <lightning:layoutItem padding="around-small">
+                <aura:iteration items="{!v.classificacaoEstrela}" var="item">
+                    <lightning:icon iconName="custom:custom11" title="custom11" />
+                </aura:iteration>
+        </lightning:layoutItem>
+    </lightning:layout>
+
+</aura:component>

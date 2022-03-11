@@ -1,0 +1,34 @@
+.THIS {
+}
+
+.THIS.lista
+{
+    border: 1px solid #dddbda;
+    border-radius: 5px;
+}
+
+.THIS .item
+{
+    padding: 10px;
+    border-bottom: 1px solid #dddbda;
+}
+
+.THIS .item:hover
+{
+    background-color: #a7cfac;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.THIS .item:focus
+{
+    color: white;
+    background-color: #1b6a12 !important;
+}
+
+
+.THIS .item.selecionado
+{
+    background-color: #1b6a12;
+    color: white !important;
+}

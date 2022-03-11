@@ -1,0 +1,20 @@
+<apex:page standardController="LeadFilho__c" extensions="AceitarLeadFilhoExtension" action="{!atribuirNegociosAoUsuario}">
+    <apex:includeLightning />
+    <apex:includeScript value="/support/console/53.0/integration.js" />
+    <div id="lightning" />
+    <script>
+  
+      var callCloseTab = function callCloseTab(result) {
+        sforce.console.closeTab(result.id);
+      }
+      function closeTab() {
+        sforce.console.getEnclosingTabId(callCloseTab);
+      }
+
+      window.addEventListener('DOMContentLoaded',closeTab);
+    </script>
+
+    <body onload="closeTab()">
+
+    </body>
+</apex:page>

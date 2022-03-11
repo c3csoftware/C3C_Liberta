@@ -1,0 +1,15 @@
+.THIS {
+}
+
+.THIS.pagina
+{
+    border: none;
+    width: 100%;
+    border-radius: 5px;
+    height: 0px !important;
+}
+
+.THIS.open
+{
+    height: 400px !important;
+}

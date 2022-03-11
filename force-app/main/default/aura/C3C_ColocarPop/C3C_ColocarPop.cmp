@@ -1,0 +1,23 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId"
+    access="global">
+
+    <aura:attribute name="recordId" type="String" />
+
+    <aura:attribute name="descricaoPop" type="String" />
+
+    <c:callService service="BuscarPopTarefaService" aura:id="BuscarPopTarefaService" />
+
+    <aura:html tag="style">
+        .slds-box{
+            border-radius: none !important;
+            border: none !important;
+        }
+    </aura:html>
+
+    <div class="slds-text-heading_medium">Descrição (POP):</div>
+    <div aura:id="output" class="slds-box editor slds-text-longform slds-text-heading_small">
+        <lightning:formattedRichText value="{!v.descricaoPop}" />
+    </div>
+
+</aura:component>

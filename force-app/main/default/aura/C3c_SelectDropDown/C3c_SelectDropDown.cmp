@@ -1,0 +1,20 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+	<!--Attributes-->
+    <aura:attribute name="valueSelected" type="String" />
+    <aura:attribute name="label" type="String" />
+    <aura:attribute name="required" type="Boolean" />
+    <aura:attribute name="readOnly" type="Boolean" />
+    <aura:attribute name="options" type="List" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:registerevent name="changeSelectDropDown" type="c:ChangeSelectDropDown"/>
+
+    <!--Content-->
+    <lightning:select aura:id="selectDropdown" value="{!v.valueSelected}" disabled="{!v.readOnly}" label="{!v.label}" required="{!v.required}" name="select" onchange="{!c.onChange}">
+        <option value="">Escolha uma opção...</option>
+        <aura:iteration items="{!v.options}" var="item">
+            <option value="{!item.value}">{!item.label}</option>
+        </aura:iteration>
+    </lightning:select>
+</aura:component>

@@ -1,0 +1,36 @@
+<aura:component>
+
+    <!--Atributos-->
+
+    <aura:attribute name="visivel" type="Boolean" default="false" />
+
+    <aura:attribute name="messagem" type="String" default="teste" />
+    <aura:attribute name="tipo" type="String" default="error" />
+
+    <!--Manipuladores-->
+
+    <aura:handler name="change" value="{!v.visivel}" action="{!c.manipularVisualizacaoToast}" />
+
+    <!--Funções-->
+
+    <aura:method name="mostrarToast" action="{!c.mostrarToast}" access="PUBLIC"> 
+        <aura:attribute name="messagem" type="String" />
+        <aura:attribute name="tipo" type="String" />
+    </aura:method>
+
+    <!--Conteúdo-->
+
+    <aura:if isTrue="{!v.visivel}">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="{!'slds-notify slds-notify_toast slds-theme_'+v.tipo}" role="status">
+                <lightning:icon iconName="{!'utility:'+v.tipo}" variant="inverse" alternativeText="Error!" title="Error" />
+                <div class="slds-notify__content">
+                    <h4>{!v.messagem}</h4>
+                </div>
+                <div class="slds-notify__close">
+                    <lightning:buttonIcon iconName="utility:close" variant="bare-inverse" size="large" title="Close" alternativeText="Close window" onclick="{!c.fecharToast}"/>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

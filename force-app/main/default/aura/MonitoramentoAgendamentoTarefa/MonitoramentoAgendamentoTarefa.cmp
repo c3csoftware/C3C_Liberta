@@ -1,0 +1,109 @@
+<aura:component
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <!--Atributos-->
+
+    <aura:attribute name="recordId" type="String" />
+
+    <aura:attribute name="listaDataAgendamentoTarefa" type="List" />
+    <aura:attribute name="numDiasDesdeUltimaTarefa" type="Integer" default="0" />
+
+    <!--Atributos de controle-->
+    <aura:attribute name="chamadaComErro" type="Boolean" default="false" />
+    <aura:attribute name="carregando" type="Boolean" default="true" />
+
+    <!--Serviços Back-->
+    <c:callService service="AgendamentoTarefaService" aura:id="AgendamentoTarefaService" />
+
+    <!--Manipuladores-->
+
+    <aura:handler event="force:refreshView" action="{!c.doInit}" />
+
+    <!--Conteúdo-->
+
+    <lightning:card title="{!'Agendamentos de Tarefas - Última atividade foi a '+v.numDiasDesdeUltimaTarefa+' dias.'}" iconName="standard:event">
+        <aura:if isTrue="{! v.carregando}">
+            <lightning:spinner size="small" />
+
+            <aura:set attribute="else">
+                <!--Verificar se deu erro no processo de busca-->
+                <aura:if isTrue="{!v.chamadaComErro}">
+                    <h1>Error</h1>
+
+                    <aura:set attribute="else">
+                        
+                        <aura:if isTrue="{!v.listaDataAgendamentoTarefa.length == 0}">
+                            <div class="center"><h1>Nenhum dado encontrado no mês corrente.</h1></div>
+                            <aura:set attribute="else">
+                                <div class="timeline" id="timeline">
+                                    <aura:iteration items="{!v.listaDataAgendamentoTarefa}" var="dataAgendamentoTarefa">
+                                        <div class="timeline__group">
+                                            <div class="timeline__cards">
+                                                <div class="timeline__card card">
+                                                    <aura:if isTrue="{!dataAgendamentoTarefa.listaAgendamentoTarefa.length > 0}">
+                                                        <header class="card__header">
+                                                            <time class="time">
+                                                                {!dataAgendamentoTarefa.dataAgendamentoFormatado == '---' ? 'Em andamento' : 'Agendado '+dataAgendamentoTarefa.dataAgendamentoFormatado}
+                                                            </time>
+                                                        </header>
+                                                        <div class="card__content">
+                                                            <div>
+                                                                <aura:iteration items="{!dataAgendamentoTarefa.listaAgendamentoTarefa}" var="agendamentoTarefa">
+                                                                    <p>
+                                                                        {!agendamentoTarefa.listaAgendamentoTarefa.tipoTipoTarefa + ' - ' + agendamentoTarefa.listaAgendamentoTarefa.nome }
+                                                                        <aura:if isTrue="{!dataAgendamentoTarefa.tarefaAberta != undefined}">
+                                                                            - <a href="{!'/'+agendamentoTarefa.tarefaAberta.recordId}">Tarefa</a>
+                                                                        </aura:if>
+                                                                    </p>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!dataAgendamentoTarefa.listaTarefasMes.length > 0}">
+                                                        <header class="card__header">
+                                                            <time class="time">
+                                                                {!'TAREFA '+dataAgendamentoTarefa.dataAgendamentoFormatado}
+                                                            </time>
+                                                        </header>
+                                                        <div class="card__content">
+                                                            <div>
+                                                                <aura:iteration items="{!dataAgendamentoTarefa.listaTarefasMes}" var="tarefa">
+                                                                    <p>
+                                                                        {!tarefa.assunto} - <a href="{!'/'+tarefa.recordId}">Tarefa</a>
+                                                                    </p>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!dataAgendamentoTarefa.compromissosMes.length > 0}">
+                                                        <header class="card__header">
+                                                            <time class="time">
+                                                                {!'COMPRIMISSO '+dataAgendamentoTarefa.dataAgendamentoFormatado}
+                                                            </time>
+                                                        </header>
+                                                        <div class="card__content">
+                                                            <div>
+                                                                <aura:iteration items="{!dataAgendamentoTarefa.compromissosMes}" var="compromisso">
+                                                                    <p>
+                                                                        {!compromisso.assunto} - <a href="{!'/'+compromisso.idRegistro}">Compromisso</a>
+                                                                    </p>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                </div>
+                                            </div>
+                                            <span class="timeline__year time" aria-hidden="true">{!dataAgendamentoTarefa.dataAgendamentoFormatado == '---' ? 'EM ANDAMENTO' : dataAgendamentoTarefa.dataAgendamentoFormatado}</span>
+                                        </div>
+                                    </aura:iteration>
+                                </div>
+                            </aura:set>
+                        </aura:if>
+                    </aura:set>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+
+</aura:component>

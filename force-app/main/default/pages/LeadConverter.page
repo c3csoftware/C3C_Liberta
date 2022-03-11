@@ -1,0 +1,28 @@
+<apex:page standardController="Lead" extensions="LeadConverterController" action="{!convertLead}">
+  <!-- <apex:pagemessages/> -->
+  <apex:includeLightning />
+  <apex:includeScript value="/support/console/53.0/integration.js" />
+  <div id="lightning" />
+  <script>
+
+    var callCloseTab = function callCloseTab(result) {
+      sforce.console.closeTab(result.id);
+    }
+    function closeTab() {
+      sforce.console.getEnclosingTabId(callCloseTab);
+    }
+
+    $Lightning.use("c:C3C_ConverterLeadErroAPP", function () {
+      $Lightning.createComponent("c:C3C_ConverterLeadErro",
+        {
+          "tipoDeErro": "{!tipoDeErro}",
+          "idLead": "{!idLead}"
+        },
+        "lightning",
+        function (cmp) {
+          $A.eventService.addHandler({ "event": "c:C3C_FecharGuiaVF", "handler": closeTab });
+        }
+      );
+    });  
+  </script>
+</apex:page>

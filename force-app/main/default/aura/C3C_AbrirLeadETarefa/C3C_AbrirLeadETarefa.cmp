@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="idLead" type="String" />
+    <aura:attribute name="idLeadFilho" type="String" />
+    <aura:attribute name="idOportunidade" type="String" />
+    <aura:attribute name="idTarefa" type="String" />
+
+    <c:callService service="BuscarInfomacoesLeadFilhoService" aura:id="BuscarInfomacoesLeadFilhoService" />
+    <c:callService service="BuscarInformacoesTarefaService" aura:id="BuscarInformacoesTarefaService" />
+    <lightning:workspaceAPI aura:id="workspace" />
+
+</aura:component>

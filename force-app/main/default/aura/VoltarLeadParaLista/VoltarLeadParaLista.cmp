@@ -1,0 +1,96 @@
+<aura:component 
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+    <!--Atributos-->
+
+    <aura:attribute name="recordId" type="String" />
+
+    <!--Atributos para o Grupo de flags-->
+
+    <aura:attribute name="opcoesFlag" type="List" />
+    <aura:attribute name="opcoesFlagSelecionados" type="List" />
+
+    <aura:attribute name="mostrarProcessoVoltarLeadLista" type="Boolean" default="false" />
+    <aura:attribute name="registroNaoQualificado" type="Boolean" default="false" />
+
+    <!--Atributos para definir a lista de lead-->
+
+    <aura:attribute name="listaLeads" type="List" />
+    <aura:attribute name="carregandoListaLead" type="Boolean" default="true" />
+    <aura:attribute name="listaLeadSelecionado" type="String" />
+
+    <!--Atributos para definir visibilidade do botão-->
+    <aura:attribute name="botaoVoltaListaLeadAtivo" type="Boolean" default="false" />
+
+    <!--Serviços back-end-->
+
+    <c:callService service="LeadFilhoService" aura:id="LeadFilhoService" />
+    
+    <!--Manipuladores-->
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!--Conteúdo-->
+
+    <!-- HTML -->
+    <aura:html tag="style">
+        .cuf-content {
+        padding: 0 0rem !important;
+        }
+        .slds-p-around--medium {
+        padding: 20px !important;
+        }
+        .slds-modal__content{
+        height:unset !important;
+        max-height:unset !important;
+        }
+        .slds-p-right_small, .slds-p-right--small{
+        padding-right: 0px !important;
+        }
+    </aura:html>
+
+    <lightning:card>
+        <p>Para voltar o registro para Lista de Lead é necessário informar quais opções o cliente não deu retorno.</p>
+        <br />
+        <lightning:checkboxGroup
+            label="Selecione as opções:"
+            options="{! v.opcoesFlag }"
+            value="{! v.opcoesFlagSelecionados }"
+            onchange="{! c.mudarValoresSelecionados }"/>
+        <br />
+        <aura:if isTrue="{!v.mostrarProcessoVoltarLeadLista}">
+            <aura:if isTrue="{!v.carregandoListaLead}">
+                <lightning:spinner />
+            
+                <aura:set attribute="else">
+                    <aura:if isTrue="{!v.listaLeads.length == 0}">
+                        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                            <lightning:icon iconName="utility:warning" alternativeText="Warning!" size="small" title="Warning" />
+                            <h2>Atenção: Não podemos voltar o registro para Lista de Lead pois ele não tem nenhuma Lista de Lead relacionada.</h2>
+                        </div>
+
+                        <aura:set attribute="else">
+                            <lightning:select label="Seleciona a Lista Lead: " disabled="{!v.listaLeads.length == 1}" value="{!v.listaLeadSelecionado}" aura:id="picklistListaLead" onchange="{!c.listaLeadSelecionado}">
+                                <option value="">Selecione uma opção...</option>
+                                <aura:iteration items="{!v.listaLeads}" var="listaLead">
+                                    <option value="{!listaLead.recordId}">{!listaLead.nomeLista}</option>
+                                </aura:iteration>
+                            </lightning:select>
+                            <br />
+                            <lightning:button class="btnLarge" disabled="{!v.botaoVoltaListaLeadAtivo}" variant="brand" label="Voltar para Lista Lead" title="Voltar para Lista Lead" onclick="{! c.voltarParaListaLead }" />
+                        </aura:set>
+                    </aura:if>
+                </aura:set>
+            </aura:if>
+            <aura:set attribute="else">
+                <aura:if isTrue="{!v.registroNaoQualificado}">
+                    <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+                        <lightning:icon iconName="utility:warning" alternativeText="Warning!" size="small" title="Warning" />
+                        <h2>Atenção: Registro não qualificado para voltar a Lista de Lead.</h2>
+                    </div>
+                </aura:if>
+            </aura:set>
+        </aura:if>
+    </lightning:card>
+</aura:component>

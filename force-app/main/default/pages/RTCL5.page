@@ -1,0 +1,150 @@
+<apex:page showHeader="false" standardStylesheets="false">
+    <apex:includeScript value="{!$Resource.json2_js}"/>
+    <script type="text/javascript" src="{!URLFOR($Resource.cometd_zip, 'dojo/dojo.js')}" data-dojo-config="async: 1"></script>
+    <script>var token = '{!$Api.Session_ID}';</script>
+    <script type="text/javascript" src="{!$Resource.demo_js}">
+    </script>
+
+    <script>
+        let inscrito = false;
+        let connectado = false;
+
+        window.onChangeConnection = (message) => 
+        {
+            if(message.successful)
+                connectado = true;
+
+            if(!inscrito && message.successful) 
+            {
+                window.pushTopicEventSubscribe('/topic/TarefaTransferenciaEvent');
+                window.pushTopicEventSubscribe('/event/EventosL5Callbox__e');
+            }
+        }
+
+        window.onChangeSubscription = (message) => 
+        {
+            inscrito = message.successful;
+        }
+
+        window.onChangePushEvent = (message) => 
+        {
+            if(!!CMPCallbox)
+            {
+                switch(message.channel)
+                {
+                    case '/topic/TarefaTransferenciaEvent':
+                        if(message.data.sobject.RamalTransferencia__c == CMPCallbox.get('v.ramal') && CMPCallbox.get('v.ramalRegistrado'))
+                            CMPCallbox.set('v.telefone', message.data.sobject.CallObject);
+
+                        break;
+
+                    case '/event/EventosL5Callbox__e':
+                        switch(message.data.payload.Nome__c)
+                        {
+                            case 'Registrando Ramal':
+                                let objCorpo = JSON.parse(message.data.payload.Corpo__c);
+
+                                if(objCorpo.p0 == CMPCallbox.get('v.ramal') && objCorpo.p1 != urlParams.searchParams.get('identificacaoGuia'))
+                                    CMPCallbox.unregisterRamal();
+                                break;
+                        }
+
+                        break;
+                }
+            }
+        }
+    </script>
+
+    <style>
+        #demo
+        {
+            opacity: 0;
+            position: absolute;
+            width: 0px;
+        }
+
+        #demo td
+        {
+            display: none;
+        }
+    </style>
+
+    <div id="demo">
+        <div id="datastream"></div>
+        <script type="text/javascript" src="{!$Resource.demo_js}">
+        </script>
+        <div id="input">
+            <div id="join">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td> Enter Topic Name </td>
+                            <td>
+                                <input id="topic" type="text" />
+                            </td>
+                            <td>
+                                <button id="subscribeButton" 
+                                    class="button">Subscribe</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div id="joined">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <button id="leaveButton" 
+                                    class="button">Unsubscribe</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <apex:includeLightning />
+
+    <div id="cmpLigacao" />
+    <script>
+        (function(d,l,a,p) {
+        var h=d.getElementsByTagName('head')[0],u=Date.now(),j=window;
+        var c=d.createElement('script');c.async=true;c.type='text/javascript';
+        c.src=p+'://'+l+'/'+a+'?d='+u;h.appendChild(c);
+        })(document,'gocall.l5.com.br','integration/webphone/v1/webphone.l5.js','https');
+        
+        var urlParams = new URL(window.location.href);
+
+        var CMPCallbox;
+
+        $Lightning.use('c:RTCCallboxAPP', function() {
+            $Lightning.createComponent('c:RTCCallBox',
+                {
+                    identificacaoGuia: urlParams.searchParams.get('identificacaoGuia'),
+                    ligarRedirect: urlParams.searchParams.get('ligar') == 'true',
+                    registroRelacionado: urlParams.searchParams.get('registrorelacionado')
+                },
+                'cmpLigacao',
+                function(cmp) 
+                {
+                    CMPCallbox = cmp;
+
+                    $A.eventService.addHandler({ "event": "c:CallboxAuraEvent", "handler" : callboxLoginCarregado});
+                }
+            );
+        });
+
+        var callboxLoginCarregado = function(event)
+        {
+            if(urlParams.searchParams.get('ligar') == 'true' && urlParams.searchParams.get('ramalAtual') == 'true')
+            {
+                CMPCallbox.logarRamalELigarTelfone(urlParams.searchParams.get('numerocelular'), null, urlParams.searchParams.get('registrorelacionado'));
+            }
+            else if(urlParams.searchParams.get('ligar') == 'true' && urlParams.searchParams.get('ramal') == CMPCallbox.get('v.ramal'))
+                CMPCallbox.logarRamalELigarTelfone(urlParams.searchParams.get('numerocelular'), urlParams.searchParams.get('idregistro'), urlParams.searchParams.get('registrorelacionado'));
+        } 
+    </script>
+</apex:page>

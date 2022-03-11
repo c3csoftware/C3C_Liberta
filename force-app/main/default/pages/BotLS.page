@@ -1,0 +1,100 @@
+<apex:page >
+<style type='text/css'>
+    .embeddedServiceHelpButton .helpButton .uiButton {
+        background-color: #005290;
+        font-family: "Arial", sans-serif;
+    }
+    .embeddedServiceHelpButton .helpButton .uiButton:focus {
+        outline: 1px solid #005290;
+    }
+</style>
+
+<script type='text/javascript' src='https://service.force.com/embeddedservice/5.0/esw.min.js'></script>
+<script type='text/javascript'>
+     function  test() {
+        var origOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function() {
+            console.log('request started!');
+            this.addEventListener('load', function() {
+                console.log('request completed!');
+                console.log(this.readyState); //will always be 4 (ajax is completed successfully)
+                console.log(JSON.parse(this.responseText)); //whatever the response was
+            });
+            origOpen.apply(this, arguments);
+        };
+    };
+    test();
+    var initESW = function(gslbBaseURL) {
+        embedded_svc.settings.displayHelpButton = true; //Ou falso
+        embedded_svc.settings.language = ''; //Por exemplo, insira "pt" ou "pt-BR"
+
+        //embedded_svc.settings.defaultMinimizedText = '...'; //(Assume como padrão o Chat com um especialista)
+        //embedded_svc.settings.disabledMinimizedText = '...'; //(Assume como padrão Agente off-line)
+
+        //embedded_svc.settings.loadingText = ''; //(Assume como padrão Carregando)
+        //embedded_svc.settings.storageDomain = 'yourdomain.com'; //(Define o domínio de sua implantação para que seus visitantes possam navegar em subdomínios durante uma sessão de chat)
+
+        // Configurações para Chat
+        //embedded_svc.settings.directToButtonRouting = function(prechatFormData) {
+            // Dynamically changes the button ID based on what the visitor enters in the pre-chat form.
+            // Returns a valid button ID.
+        //};
+        //embedded_svc.settings.prepopulatedPrechatFields = {}; //Define o preenchimento automático de campos de formulário de pré-chat
+        //embedded_svc.settings.fallbackRouting = []; //Uma matriz de IDs de botão, IDs de usuário ou userId_buttonId
+        //embedded_svc.settings.offlineSupportMinimizedText = '...'; //(Padronizado para Entre em contato conosco)
+
+        embedded_svc.settings.enabledFeatures = ['LiveAgent'];
+        embedded_svc.settings.entryFeature = 'LiveAgent';
+
+        embedded_svc.init(
+            'https://liberta--dev.my.salesforce.com',
+            'https://dev-libertadev.cs219.force.com',
+            gslbBaseURL,
+            '00D8G0000008g7F',
+            'BotLS',
+            {
+                baseLiveAgentContentURL: 'https://c.la5-c1cs-ia4.salesforceliveagent.com/content',
+                deploymentId: '5728G000000GmcP',
+                buttonId: '5738G000000GmdS',
+                baseLiveAgentURL: 'https://d.la5-c1cs-ia4.salesforceliveagent.com/chat',
+                eswLiveAgentDevName: 'Equipe_de_Chat_2',
+                isOfflineSupportEnabled: true
+            }
+        );
+    };
+
+    if (!window.embedded_svc) {
+        var s = document.createElement('script');
+        s.id = 'botL&S';
+        s.setAttribute('src', 'https://liberta--dev.my.salesforce.com/embeddedservice/5.0/esw.min.js');
+        s.onload = function() {
+            initESW(null);
+        };
+        console.log('logue if');
+        document.body.appendChild(s);
+    } else {
+        initESW('https://service.force.com');
+        console.log('logue else');
+    }
+    var checkChatEnded = function () 
+    {
+        let listaElementsWithEnded = document.getElementsByClassName('ended');
+        
+        if(listaElementsWithEnded.length>0)
+        {
+            debugger;
+            embedded_svc.liveAgentAPI.startChat({
+                directToAgentRouting: {
+                buttonId: '5738G000000GmdS',
+                // userId: “”,
+                fallback: false
+            },
+            extraPrechatInfo: [],
+            extraPrechatFormDetails: []
+            });
+        }
+   }
+    
+    setInterval(checkChatEnded , 500);
+</script>
+</apex:page>
