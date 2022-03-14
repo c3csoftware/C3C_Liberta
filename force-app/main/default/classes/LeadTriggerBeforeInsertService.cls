@@ -7,9 +7,9 @@ public without sharing virtual class LeadTriggerBeforeInsertService implements I
         for(ILeadDomain leadDomain : listaLeadDomain)
         {
             // Verificação para o caso de o Lead está sendo criado pelo Webhook - Id Webhook
-            System.debug('LeadTriggerBeforeInsertService -> Lead CriadoPorId: '+ leadDomain.obterMapper().criadoPorId );
-            if (leadDomain.obterMapper().record.get('CreatedById') == '0058G000000IWuNQAW' )
-                continue;
+            // System.debug('LeadTriggerBeforeInsertService -> Lead CriadoPorId: '+ leadDomain.obterMapper().criadoPorId );
+            // if (leadDomain.obterMapper().record.get('CreatedById') == '0058G000000IWuNQAW' )
+            //     continue;
 
             leadDomain.obterMapper().proprietario = leadSemDono.recordId;
         }

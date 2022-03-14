@@ -16,7 +16,7 @@ public without sharing class UserMapper extends C3C_AbstractMapper implements C3
             this.setValueInRecord('Id', value);
         }
     }
-    
+
     @AuraEnabled public String nome
     {
         get;
@@ -26,7 +26,7 @@ public without sharing class UserMapper extends C3C_AbstractMapper implements C3
             this.setValueInRecord('Name', value);
         }
     }
-    
+
     @AuraEnabled public String ramal
     {
         get;
@@ -93,7 +93,7 @@ public without sharing class UserMapper extends C3C_AbstractMapper implements C3
     //Construtores
     public UserMapper()
     {}
-    
+
     private UserMapper(SObject usuarioSObject)
     {
         //Sinalizando que iniciou a construção da instância para não preencher o record pelo "setValueInRecord"

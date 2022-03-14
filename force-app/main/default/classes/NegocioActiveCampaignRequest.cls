@@ -45,7 +45,7 @@ public without sharing class NegocioActiveCampaignRequest implements C3C_DI_IPro
             this.pipeline_title = mapaParametros.get('deal[pipeline_title]');
             this.pipelineid = mapaParametros.get('deal[pipelineid]');
             this.contactid = mapaParametros.get('contact[id]');
-            this.contact_firstname = mapaParametros.get('contact[firstname]');
+            this.contact_firstname = mapaParametros.get('contact[first_name]');
             this.contact_email = mapaParametros.get('contact[email]');
             this.ownerid = mapaParametros.get('deal[owner]');
             

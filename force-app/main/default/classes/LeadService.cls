@@ -6,7 +6,6 @@ public without sharing class LeadService implements ILeadService
 
         ILeadDomain leadDomain = (ILeadDomain) C3C_DIContainer_Injector.newInstance('LeadDomain');
         LeadMapper leadMapper = leadDomain.criarLead(activeCampaignId, nome, sobrenome, email, empresa, telefone);
-        System.debug('Classe: LeadService: LeadMapper: ' + JSON.serialize(leadMapper));
         uow.registerUpsertUsingExternalId(leadMapper.record, 'ActiveCamp__Active_Campaign_Id__c');
 
         uow.commitWork();
