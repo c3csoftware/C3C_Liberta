@@ -1,0 +1,24 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" controller="GerarPlanilhaController" access="global">
+
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="Email" type="String"/>
+    <aura:attribute name="DataInicial" type="datetime"/>
+    <aura:attribute name="DataFinal" type="datetime"/>
+    
+    <lightning:card title="Exporte de Dados" class="card">
+
+        <div class="row">
+            <lightning:input type="email" value="{!v.Email}" name="Email" placeholder="email@email.com" label="Email" />
+            <lightning:input type="datetime" value="{!v.DataInicial}" name="DataInicial" label="Data Inicial" />
+            <lightning:input type="datetime" value="{!v.DataFinal}" name="DataFinal" label="Data Final" />
+        </div>
+        
+        <div class="botao">
+        	<lightning:layoutItem padding="horizontal-small" size="12">
+            	<lightning:button onclick="{!c.exportarDados}" variant="brand" class="btn" label="Exportar" />
+        	</lightning:layoutItem>
+        </div>
+
+    </lightning:card>
+    
+</aura:component>
