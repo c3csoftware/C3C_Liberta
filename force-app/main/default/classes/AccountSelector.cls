@@ -42,6 +42,14 @@ public with sharing virtual class AccountSelector extends fflib_SObjectSelector 
         return (List<SObject>) this.libDatabase.queryExecute(query.toSOQL());
     }
 
+    public List<SObject> buscarContasComPesquisaParaHoje()
+    {
+        fflib_QueryFactory query = newQueryFactory();
+        // query.addCondition('', 'Id', '=', '0018G00000Af3q4QAB');
+
+        return (List<SObject>) this.libDatabase.queryExecute(query.toSOQL());
+    }
+
 
     public List<SObject> buscarContasPorDadosLead(List<LeadMapper> listaLeadMapper)
     {
